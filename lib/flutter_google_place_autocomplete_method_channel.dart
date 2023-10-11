@@ -32,6 +32,9 @@ class MethodChannelFlutterGooglePlaceAutocomplete
       switch (e.code) {
         case 'GPA_FIELDS_EMPTY':
           throw AutocompleteRequestFieldsEmptyException();
+        case 'GPA_UNEXPECTED_ERROR':
+          throw AutocompleteUnexpectedException(
+              message: e.message ?? 'Unexpected error occured!');
         default:
           rethrow;
       }

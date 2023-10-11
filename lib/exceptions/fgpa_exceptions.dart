@@ -11,3 +11,13 @@ class AutocompleteRequestFieldsEmptyException
   String toString() =>
       'You must provide at least a one FIELD with your request';
 }
+
+class AutocompleteUnexpectedException
+    extends FlutterGoogleAutocompleteException {
+  final String message;
+
+  AutocompleteUnexpectedException({required this.message});
+
+  @override
+  String toString() => message;
+}

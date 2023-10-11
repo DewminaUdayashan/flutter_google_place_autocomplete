@@ -265,12 +265,12 @@ public class FlutterGooglePlaceAutocompletePlugin implements FlutterPlugin, Meth
 
                 if (websiteUri != null) map.put("websiteUri", websiteUri.toString());
 
-                Log.i("TAG", "onActivityResult: " + map);
                 if (result != null) {
                     try {
                         result.success(map);
                     } catch (Exception e) {
                         Log.i("TAG", "onActivityResult: " + e);
+                        result.error("GPA_UNEXPECTED_ERROR", e.getMessage(), null);
                     }
                 }
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
