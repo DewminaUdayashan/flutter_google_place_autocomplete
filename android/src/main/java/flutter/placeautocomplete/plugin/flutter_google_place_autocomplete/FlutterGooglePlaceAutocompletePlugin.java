@@ -4,6 +4,7 @@ import static android.app.Activity.RESULT_OK;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -11,9 +12,19 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AddressComponent;
+import com.google.android.libraries.places.api.model.AddressComponents;
+import com.google.android.libraries.places.api.model.DayOfWeek;
+import com.google.android.libraries.places.api.model.LocalDate;
+import com.google.android.libraries.places.api.model.OpeningHours;
+import com.google.android.libraries.places.api.model.Period;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceTypes;
+import com.google.android.libraries.places.api.model.PlusCode;
+import com.google.android.libraries.places.api.model.SpecialDay;
+import com.google.android.libraries.places.api.model.TimeOfWeek;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -110,25 +121,157 @@ public class FlutterGooglePlaceAutocompletePlugin implements FlutterPlugin, Meth
 
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE && data != null) {
             if (resultCode == RESULT_OK) {
+                final HashMap<String, Object> map = new HashMap<>();
+
                 final Place place = Autocomplete.getPlaceFromIntent(data);
                 // Handle the selected place
                 final String placeName = place.getName();
                 final String placeId = place.getId();
                 final LatLng latlng = place.getLatLng();
+                final LatLngBounds viewport = place.getViewport();
+                final String address = place.getAddress();
+                final AddressComponents addressComponents = place.getAddressComponents();
+                final Place.BooleanPlaceAttributeValue curbsidePickup = place.getCurbsidePickup();
+                final Place.BooleanPlaceAttributeValue delivery = place.getDelivery();
+                final Place.BooleanPlaceAttributeValue dineIn = place.getDineIn();
+                final Place.BooleanPlaceAttributeValue reservable = place.getReservable();
+                final Place.BooleanPlaceAttributeValue servesBeer = place.getServesBeer();
+                final Place.BooleanPlaceAttributeValue servesBreakfast = place.getServesBreakfast();
+                final Place.BusinessStatus businessStatus = place.getBusinessStatus();
+                final String editorialSummery = place.getEditorialSummary();
+                final String iconUrl = place.getIconUrl();
+                final OpeningHours openingHours = place.getOpeningHours();
+                final OpeningHours currentOpeningHours = place.getCurrentOpeningHours();
+                final List<OpeningHours> secondaryOpeningHours = place.getSecondaryOpeningHours();
+                final String phoneNumber = place.getPhoneNumber();
+                final PlusCode plusCode = place.getPlusCode();
+                final Integer priceLevel = place.getPriceLevel();
+                final Double rating = place.getRating();
+                final Integer userRatingsTotal = place.getUserRatingsTotal();
+                final Integer iconBackgroundColor = place.getIconBackgroundColor();
+                final Place.BooleanPlaceAttributeValue servesBrunch = place.getServesBrunch();
+                final Place.BooleanPlaceAttributeValue servesDinner = place.getServesDinner();
+                final Place.BooleanPlaceAttributeValue servesLunch = place.getServesLunch();
+                final Place.BooleanPlaceAttributeValue servesVegetarianFood = place.getServesVegetarianFood();
+                final Place.BooleanPlaceAttributeValue servesWine = place.getServesWine();
+                final Place.BooleanPlaceAttributeValue takeout = place.getTakeout();
+                final Place.BooleanPlaceAttributeValue wheelchairAccessibleEntrance = place.getWheelchairAccessibleEntrance();
+                final List<Place.Type> types = place.getTypes();
+                final Integer utcOffset = place.getUtcOffsetMinutes();
+                final Uri websiteUri = place.getWebsiteUri();
 
-                final HashMap<String, Object> map = new HashMap<>();
+                if (placeId != null) map.put("id", placeId);
 
-                if (placeId != null) map.put("place_id", placeId);
-
-                if (placeName != null) map.put("place_name", placeName);
+                if (placeName != null) map.put("name", placeName);
 
                 if (latlng != null) {
-                    map.put("lat", latlng.latitude);
-                    map.put("long", latlng.longitude);
+                    final HashMap<String, Object> coordinatesMap = new HashMap<>();
+                    coordinatesMap.put("latitude", latlng.latitude);
+                    coordinatesMap.put("longitude", latlng.longitude);
+                    map.put("coordinates", coordinatesMap);
                 }
 
+                if (viewport != null) {
+                    final HashMap<String, Object> viewportMap = new HashMap<>();
+
+                    final HashMap<String, Object> northEast = new HashMap<>();
+                    northEast.put("latitude", viewport.northeast.latitude);
+                    northEast.put("longitude", viewport.northeast.longitude);
+
+                    final HashMap<String, Object> southWest = new HashMap<>();
+                    southWest.put("latitude", viewport.southwest.latitude);
+                    southWest.put("longitude", viewport.southwest.longitude);
+
+                    viewportMap.put("northeast", northEast);
+                    viewportMap.put("southwest", southWest);
+
+                    map.put("viewport", viewportMap);
+                }
+
+                if (address != null) map.put("address", address);
+
+                if (addressComponents != null) {
+                    final List<HashMap<String, Object>> addressComponentsList = new ArrayList<>();
+                    for (AddressComponent component : addressComponents.asList()) {
+                        final HashMap<String, Object> co = new HashMap<>();
+                        co.put("name", component.getName());
+                        co.put("shortName", component.getShortName());
+                        co.put("types", component.getTypes());
+                        addressComponentsList.add(co);
+                    }
+                    map.put("addressComponents", addressComponentsList);
+                }
+
+                if (businessStatus != null) map.put("businessStatus", businessStatus.name());
+
+                if (editorialSummery != null) map.put("editorialSummary", editorialSummery);
+                if (iconUrl != null) map.put("iconUrl", iconUrl);
+                if (openingHours != null)
+                    map.put("openingHours", Utils.mapFromOpeningHours(openingHours));
+
+                if (currentOpeningHours != null)
+                    map.put("currentOpeningHours", Utils.mapFromOpeningHours(currentOpeningHours));
+
+                if (secondaryOpeningHours != null) {
+                    final List<HashMap<String, Object>> secondaryOpeningHoursList = new ArrayList<>();
+                    for (OpeningHours hour : secondaryOpeningHours) {
+                        secondaryOpeningHoursList.add(Utils.mapFromOpeningHours(hour));
+                    }
+                    map.put("secondaryOpeningHours", secondaryOpeningHoursList);
+                }
+
+                if (phoneNumber != null) {
+                    map.put("phoneNumber", phoneNumber);
+                }
+
+                if (plusCode != null) {
+                    final Map<String, Object> plusCodeMap = new HashMap<>();
+                    plusCodeMap.put("compoundCode", plusCode.getCompoundCode());
+                    plusCodeMap.put("globalCode", plusCode.getGlobalCode());
+                    map.put("plusCode", plusCodeMap);
+                }
+
+                if (priceLevel != null) map.put("priceLevel", priceLevel);
+
+                if (rating != null) map.put("rating", rating);
+
+                if (userRatingsTotal != null) map.put("userRatingsTotal", userRatingsTotal);
+
+                if (iconBackgroundColor != null)
+                    map.put("iconBackgroundColor", iconBackgroundColor);
+
+                map.put("curbsidePickup", curbsidePickup.name());
+                map.put("delivery", delivery.name());
+                map.put("dineIn", dineIn.name());
+                map.put("reservable", reservable.name());
+                map.put("servesBeer", servesBeer.name());
+                map.put("servesBreakfast", servesBreakfast.name());
+                map.put("servesBrunch", servesBrunch.name());
+                map.put("servesDinner", servesDinner.name());
+                map.put("servesLunch", servesLunch.name());
+                map.put("servesVegetarianFood", servesVegetarianFood.name());
+                map.put("servesWine", servesWine.name());
+                map.put("takeout", takeout.name());
+                map.put("wheelchairAccessibleEntrance", wheelchairAccessibleEntrance.name());
+
+                if (types != null) {
+                    final List<String> typesList = new ArrayList<>();
+                    for (Place.Type type : types)
+                        typesList.add(type.name());
+                    map.put("types", typesList);
+                }
+
+                if (utcOffset != null) map.put("utcOffset", utcOffset);
+
+                if (websiteUri != null) map.put("websiteUri", websiteUri.toString());
+
+                Log.i("TAG", "onActivityResult: " + map);
                 if (result != null) {
-                    result.success(map);
+                    try {
+                        result.success(map);
+                    } catch (Exception e) {
+                        Log.i("TAG", "onActivityResult: " + e);
+                    }
                 }
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
 

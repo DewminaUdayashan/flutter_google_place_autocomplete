@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_google_place_autocomplete/enums/auto_complete_dialog_mode.dart';
 import 'package:flutter_google_place_autocomplete/enums/place_field.dart';
-import 'package:flutter_google_place_autocomplete/exceptions/fgpa_exceptions.dart';
 import 'package:flutter_google_place_autocomplete/flutter_google_place_autocomplete.dart';
 import 'package:flutter_google_place_autocomplete/models/prediction.dart';
 
@@ -21,6 +20,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Prediction? place;
+
   @override
   void initState() {
     super.initState();
@@ -34,41 +35,32 @@ class _MyAppState extends State<MyApp> {
   }
 
   void showDialog() async {
-    try {
-      final Prediction? place =
-          await FlutterGooglePlaceAutocomplete.showAutoCompleteDialog(
-        fields: [PlaceField.id, PlaceField.name],
-        autoCompleteDialogMode: AutoCompleteDialogMode.overlay,
-      );
-      if (place == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("null"),
-          ));
-        }
-        return;
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("RES $place"),
-        ));
-      }
-    } catch (e) {
-      if (e is AutocompleteRequestFieldsEmptyException) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ));
-        }
-        return;
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.toString()),
-        ));
-      }
-    }
+    // try {
+    final Prediction? place =
+        await FlutterGooglePlaceAutocomplete.showAutoCompleteDialog(
+      fields: [
+        ...PlaceField.values,
+      ],
+      autoCompleteDialogMode: AutoCompleteDialogMode.overlay,
+    );
+    this.place = place;
+    setState(() {});
+    // } catch (e) {
+    //   if (e is AutocompleteRequestFieldsEmptyException) {
+    //     if (mounted) {
+    //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //         content: Text(e.toString()),
+    //         backgroundColor: Colors.red,
+    //       ));
+    //     }
+    //     return;
+    //   }
+    //   if (mounted) {
+    //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //       content: Text(e.toString()),
+    //     ));
+    //   }
+    // }
   }
 
   @override
@@ -76,6 +68,11 @@ class _MyAppState extends State<MyApp> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Plugin example app'),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(child: Text(place?.toString() ?? '')),
+        ),
       ),
       floatingActionButton: FloatingActionButton.small(onPressed: () {
         showDialog();

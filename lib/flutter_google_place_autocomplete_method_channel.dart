@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_google_place_autocomplete/exceptions/fgpa_exceptions.dart';
 
 import 'enums/auto_complete_dialog_mode.dart';
 import 'enums/place_field.dart';
+import 'exceptions/fgpa_exceptions.dart';
 import 'flutter_google_place_autocomplete_platform_interface.dart';
 import 'models/prediction.dart';
 

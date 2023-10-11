@@ -1,6 +1,6 @@
-import 'package:flutter_google_place_autocomplete/enums/auto_complete_dialog_mode.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'enums/auto_complete_dialog_mode.dart';
 import 'enums/place_field.dart';
 import 'flutter_google_place_autocomplete_method_channel.dart';
 import 'models/prediction.dart';
