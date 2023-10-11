@@ -1,0 +1,41 @@
+// enum PlaceField {
+//   address("address"),
+//   addressComponents("addressComponents"),
+//   businessStatus(),
+//   curbsidePickup,
+//   currentOpeningHours,
+//   delivery,
+//   dineIn,
+//   editorialSummary,
+//   iconBackgroundColor,
+//   iconUrl,
+//   id,
+//   latLng,
+//   name,
+//   openingHours,
+//   phoneNumber,
+//   photoMetadatas,
+//   plusCode,
+//   priceLevel,
+//   rating,
+//   reservable,
+//   secondaryOpeningHours,
+//   servesBeer,
+//   servesBreakfast,
+//   servesBrunch,
+//   servesDinner,
+//   servesLunch,
+//   servesVegetarianFood,
+//   servesWine,
+//   takeout,
+//   types,
+//   userRatingsTotal,
+//   utcOffset,
+//   viewport,
+//   websiteUri,
+//   wheelchairAccessibleEntrance;
+//
+//   const PlaceField(name);
+//
+//   final String name;
+// }
