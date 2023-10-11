@@ -18,9 +18,12 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -51,8 +54,9 @@ public class FlutterGooglePlaceAutocompletePlugin implements FlutterPlugin, Meth
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         if (call.method.equals("initialize")) {
             initializePlacesAPI(call.argument("key"), result);
-        } else if (call.method.equals("show_overlay")) {
-            showAutoCompleteOverlay(result);
+        } else if (call.method.equals("show_default")) {
+            final Map<String, Object> data = call.arguments();
+            showAutoCompleteOverlay(result, data);
         } else {
             result.notImplemented();
         }
@@ -77,14 +81,27 @@ public class FlutterGooglePlaceAutocompletePlugin implements FlutterPlugin, Meth
         }
     }
 
-    private void showAutoCompleteOverlay(@NonNull Result result) {
+    private void showAutoCompleteOverlay(@NonNull Result result, @NonNull Map<String, Object> data) {
         this.result = result;
-        // Set the fields to specify which types of place data to
-        // return after the user has made a selection.
-        final List<Place.Field> fields = Arrays.asList(Place.Field.NAME, Place.Field.ID, Place.Field.LAT_LNG);
+        final List<String> fieldsFromFlutter = new ArrayList<>();
+        fieldsFromFlutter.addAll((Collection<? extends String>) data.get("fields"));
+
+        if (fieldsFromFlutter.isEmpty()) {
+            result.error("GPA_FIELDS_EMPTY", null, null);
+            return;
+        }
+
+        final List<Place.Field> fields = new ArrayList<>();
+
+        final AutocompleteActivityMode mode = AutocompleteActivityMode.valueOf((String) data.get("mode"));
+
+        for (String field : fieldsFromFlutter) {
+            fields.add(Place.Field.valueOf(field));
+        }
+
         // Start the autocomplete intent.
-        final Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
-                .build(activity);
+        final Intent intent = new Autocomplete.IntentBuilder(mode, fields).build(activity);
+
         activity.startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
     }
 
@@ -98,11 +115,18 @@ public class FlutterGooglePlaceAutocompletePlugin implements FlutterPlugin, Meth
                 final String placeName = place.getName();
                 final String placeId = place.getId();
                 final LatLng latlng = place.getLatLng();
+
                 final HashMap<String, Object> map = new HashMap<>();
-                map.put("place_id", placeId);
-                map.put("place_name", placeName);
-                map.put("lat", latlng.latitude);
-                map.put("long", latlng.longitude);
+
+                if (placeId != null) map.put("place_id", placeId);
+
+                if (placeName != null) map.put("place_name", placeName);
+
+                if (latlng != null) {
+                    map.put("lat", latlng.latitude);
+                    map.put("long", latlng.longitude);
+                }
+
                 if (result != null) {
                     result.success(map);
                 }
