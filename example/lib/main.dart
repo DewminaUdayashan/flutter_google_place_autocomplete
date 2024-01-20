@@ -71,7 +71,14 @@ class _MyAppState extends State<MyApp> {
       ),
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView(child: Text(place?.toString() ?? '')),
+          child: SingleChildScrollView(
+            child: Text(
+              place?.toString() ?? '',
+              style: const TextStyle(
+                fontSize: 20,
+              ),
+            ),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.small(onPressed: () {
